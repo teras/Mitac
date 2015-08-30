@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# irattach This shell script takes care of starting and stopping
+# irattach (irda daemon).
+ #
+# description: lrattach is the irda daemon required for irda to work \
+# properly.
+#
+
+# Source function library.
+#. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+#. /etc/sysconfig/network
+
+# Check that networking is up.
+#[ ${NETWORKING} = "no" ] && exit 0
+
+#[ -f /usr/sbin/irattach ] || exit 0
+ 
+# See how we were called.
+case "$1" in
+    start)
+    # Start daemons.
+    echo -n "Starting irattach: "
+    modprobe ircomm-tty
+    modprobe irtty
+    modprobe irport
+    modprobe irlan
+    modprobe nsc_fir
+    irattach irda0 -s 1
+    echo
+    ;;
+stop)
+    # Stop daemons.
+    echo -n "Shutting down irattach: "
+    killall -9 irattach
+    rmmod irlan
+    rmmod ircomm-tty
+    rmmod ircomm
+    rmmod irport
+    rmmod irtty
+    rmmod nsc_fir
+    rmmod irda
+    echo
+    ;;
+status)
+    status irattach
+    ;;  
+restart|reload)
+    $0 stop
+    $0 start
+    ;;
+*)
+    echo "Usage: irda {start|stop|restart|reload|status}"
+    exit 1
+esac
+
+exit 0 
